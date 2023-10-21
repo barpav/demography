@@ -1,0 +1,34 @@
+services:
+
+  demography-storage:
+    image: postgres:alpine
+    container_name: demography-storage
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DB}
+    expose:
+      - ${DMG_STORAGE_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 2s
+      retries: 5
+  
+  demography-migrations:
+    image: migrate/migrate:v4.16.2
+    container_name: demography-migrations
+    volumes:
+      - ./migrations:/migrations
+    entrypoint:
+      [
+        "migrate",
+        "-database",
+        "postgres://${PG_USER}:${PG_PASSWORD}@${DMG_STORAGE}:${DMG_STORAGE_PORT}/${PG_DB}?sslmode=disable",
+        "-path",
+        "/migrations",
+        "up",
+      ]
+    depends_on:
+      demography-storage:
+        condition: service_healthy
