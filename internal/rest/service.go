@@ -70,7 +70,7 @@ func (s *Service) Shutdown() <-chan struct{} {
 func (s *Service) operations() *chi.Mux {
 	ops := chi.NewRouter()
 
-	// ops.Use(s.enableCORS)
+	ops.Use(s.enableCORS)
 
 	ops.Post("/v1/people", s.addNewPerson)
 	// ops.Get("/v1/people", s.searchByData)
