@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 const ageStatsURL = "https://api.agify.io"
 
 func (p *Provider) AgeByName(name string) (age int, err error) {
-	url := fmt.Sprintf("%s/?name=%s", ageStatsURL, name)
+	url := fmt.Sprintf("%s/?name=%s", ageStatsURL, url.QueryEscape(name))
 	var r *http.Response
 	r, err = http.Get(url)
 

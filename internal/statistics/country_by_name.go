@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 const countryStatsURL = "https://api.nationalize.io"
@@ -17,7 +18,7 @@ type StatsDataCountryId struct {
 }
 
 func (p *Provider) CountryByName(name string) (country string, err error) {
-	url := fmt.Sprintf("%s/?name=%s", countryStatsURL, name)
+	url := fmt.Sprintf("%s/?name=%s", countryStatsURL, url.QueryEscape(name))
 	var r *http.Response
 	r, err = http.Get(url)
 

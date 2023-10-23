@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 const genderStatsURL = "https://api.genderize.io"
 
 func (p *Provider) GenderByName(name string) (gender string, err error) {
-	url := fmt.Sprintf("%s/?name=%s", genderStatsURL, name)
+	url := fmt.Sprintf("%s/?name=%s", genderStatsURL, url.QueryEscape(name))
 	var r *http.Response
 	r, err = http.Get(url)
 
