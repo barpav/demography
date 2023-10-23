@@ -12,6 +12,7 @@ import (
 
 	"github.com/barpav/demography/internal/data"
 	"github.com/barpav/demography/internal/rest"
+	"github.com/barpav/demography/internal/statistics"
 )
 
 func main() {
@@ -50,7 +51,7 @@ func (m *microservice) launch() (err error) {
 	err = m.storage.Open()
 
 	m.api.public = &rest.Service{}
-	m.api.public.Start(m.storage)
+	m.api.public.Start(m.storage, &statistics.Provider{})
 
 	return err
 }

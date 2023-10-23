@@ -23,7 +23,7 @@ type query interface {
 
 func queriesToPrepare() []query {
 	return []query{
-		// queryCreatePersonData{},
+		queryCreateNewPersonDataV1{},
 	}
 }
 

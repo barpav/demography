@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/barpav/demography/internal/rest/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
 )
@@ -13,16 +14,25 @@ type Service struct {
 	shutdown chan struct{}
 	cfg      *config
 	server   *http.Server
+	stats    StatisticsProvider
 	storage  Storage
 }
 
-type Storage interface{}
+type StatisticsProvider interface {
+	AgeByName(name string) (age int, err error)
+	GenderByName(name string) (gender string, err error)
+	CountryByName(name string) (country string, err error)
+}
 
-func (s *Service) Start(storage Storage) {
+type Storage interface {
+	CreateNewPersonDataV1(ctx context.Context, data *models.EnrichedPersonDataV1) error
+}
+
+func (s *Service) Start(storage Storage, stats StatisticsProvider) {
 	s.cfg = &config{}
 	s.cfg.Read()
 
-	s.storage = storage
+	s.storage, s.stats = storage, stats
 
 	s.server = &http.Server{
 		Addr:    fmt.Sprintf(":%s", s.cfg.port),
@@ -62,7 +72,7 @@ func (s *Service) operations() *chi.Mux {
 
 	// ops.Use(s.enableCORS)
 
-	// ops.Post("/v1/people", s.addNewPerson)
+	ops.Post("/v1/people", s.addNewPerson)
 	// ops.Get("/v1/people", s.searchByData)
 	// ops.Get("/v1/people/{id}", s.getPersonData)
 	// ops.Put("/v1/people/{id}", s.editPersonData)
