@@ -29,6 +29,7 @@ type Storage interface {
 	SearchResultV1(ctx context.Context, filters *models.SearchFilters) (result *models.SearchResultV1, err error)
 	EnrichedPersonDataV1(ctx context.Context, id int64) (*models.EnrichedPersonDataV1, error)
 	UpdatePersonDataV1(ctx context.Context, id int64, data *models.EditedPersonDataV1) error
+	DeletePersonData(ctx context.Context, id int64) error
 }
 
 func (s *Service) Start(storage Storage, stats StatisticsProvider) {
@@ -79,7 +80,7 @@ func (s *Service) operations() *chi.Mux {
 	ops.Get("/v1/people", s.searchByData)
 	ops.Get("/v1/people/{id}", s.getPersonData)
 	ops.Put("/v1/people/{id}", s.editPersonData)
-	// ops.Delete("/v1/people/{id}", s.deletePersonData)
+	ops.Delete("/v1/people/{id}", s.deletePersonData)
 
 	return ops
 }
