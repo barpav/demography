@@ -32,8 +32,10 @@ func (s *Service) addNewPersonV1(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := r.Context()
+
 	var fullData *models.EnrichedPersonDataV1
-	fullData, err = s.enrichedPersonDataV1(&personData)
+	fullData, err = s.enrichedPersonDataV1(ctx, &personData)
 
 	if err != nil {
 		log.Err(err).Msg("Failed to receive enriched person data (v1).")
@@ -41,7 +43,7 @@ func (s *Service) addNewPersonV1(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.storage.CreateNewPersonDataV1(r.Context(), fullData)
+	err = s.storage.CreateNewPersonDataV1(ctx, fullData)
 
 	if err != nil {
 		log.Err(err).Msg("Failed to save new person data (v1).")
@@ -60,24 +62,22 @@ func (s *Service) addNewPersonV1(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Service) enrichedPersonDataV1(data *models.NewPersonDataV1) (result *models.EnrichedPersonDataV1, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(s.cfg.statsTimeout))
+func (s *Service) enrichedPersonDataV1(ctx context.Context, data *models.NewPersonDataV1) (result *models.EnrichedPersonDataV1, err error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Millisecond*time.Duration(s.cfg.statsTimeout))
 	defer cancel()
 
 	var age int
 	var gender, country string
 
-	const servicesTotal = 3
-
 	wg := &sync.WaitGroup{}
-	wg.Add(servicesTotal)
-	done := make(chan struct{}, 1)
-	interrupt := make(chan struct{}, servicesTotal)
+	wg.Add(3)
+	done := make(chan struct{})
+	interrupt := make(chan struct{})
 
 	// waiting for confirmation from all 3rd parties (all or nothing)
 	go func() {
 		wg.Wait()
-		done <- struct{}{}
+		close(done)
 	}()
 
 	// receiving age statistics from 3rd party (retries in timeout range)
@@ -143,9 +143,7 @@ func (s *Service) enrichedPersonDataV1(data *models.NewPersonDataV1) (result *mo
 	select {
 	case <-done:
 	case <-ctx.Done():
-		for i := servicesTotal; i > 0; i-- {
-			interrupt <- struct{}{}
-		}
+		close(interrupt)
 		return nil, fmt.Errorf("failed to enrich person data: %w", ctx.Err())
 	}
 
