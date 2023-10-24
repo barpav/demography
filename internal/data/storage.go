@@ -24,6 +24,7 @@ type query interface {
 func queriesToPrepare() []query {
 	return []query{
 		queryCreateNewPersonDataV1{},
+		queryGetEnrichedPersonDataV1{},
 	}
 }
 
