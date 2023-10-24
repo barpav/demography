@@ -1,5 +1,27 @@
 services:
 
+  demography-people-v1:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: ghcr.io/barpav/demography-people:v1
+    container_name: demography-people-v1
+    environment:
+      - DMG_STORAGE_HOST=${DMG_STORAGE}
+      - DMG_STORAGE_PORT=${DMG_STORAGE_PORT}
+      - DMG_STORAGE_DATABASE=${PG_DB}
+      - DMG_STORAGE_USER=${PG_USER}
+      - DMG_STORAGE_PASSWORD=${PG_PASSWORD}
+      - DMG_STATS_TIMEOUT_MS=${DMG_STATS_TIMEOUT_MS}
+      - DMG_HTTP_PORT=${DMG_HTTP_PORT}
+    ports:
+      - ${DMG_HTTP_PORT}:${DMG_HTTP_PORT}
+    depends_on:
+      demography-storage:
+        condition: service_healthy
+      demography-migrations:
+        condition: service_completed_successfully
+
   demography-storage:
     image: postgres:alpine
     container_name: demography-storage
