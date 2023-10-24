@@ -26,6 +26,7 @@ func queriesToPrepare() []query {
 		queryCreateNewPersonDataV1{},
 		queryGetEnrichedPersonDataV1{},
 		queryUpdatePersonDataV1{},
+		queryDeletePersonData{},
 	}
 }
 
