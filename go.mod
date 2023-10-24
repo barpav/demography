@@ -3,6 +3,7 @@ module github.com/barpav/demography
 go 1.20
 
 require (
+	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/rs/zerolog v1.31.0
