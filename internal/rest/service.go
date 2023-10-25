@@ -18,12 +18,14 @@ type Service struct {
 	storage  Storage
 }
 
+//go:generate mockery --name StatisticsProvider
 type StatisticsProvider interface {
 	AgeByName(name string) (age int, err error)
 	GenderByName(name string) (gender string, err error)
 	CountryByName(name string) (country string, err error)
 }
 
+//go:generate mockery --name Storage
 type Storage interface {
 	CreateNewPersonDataV1(ctx context.Context, data *models.EnrichedPersonDataV1) error
 	SearchResultV1(ctx context.Context, filters *models.SearchFilters) (result *models.SearchResultV1, err error)
