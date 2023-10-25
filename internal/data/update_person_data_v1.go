@@ -44,9 +44,9 @@ func (s *Storage) UpdatePersonDataV1(ctx context.Context, id int64, data *models
 	return nil
 }
 
-func (q ErrPersonDataNotFound) Error() string {
+func (e ErrPersonDataNotFound) Error() string {
 	return "person data not found"
 }
 
-func (q ErrPersonDataNotFound) ImplementsPersonDataNotFoundError() {
+func (e ErrPersonDataNotFound) ImplementsPersonDataNotFoundError() {
 }
