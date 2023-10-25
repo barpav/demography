@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -48,6 +49,8 @@ func (s *Service) editPersonDataV1(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	log.Info().Msg(fmt.Sprintf("Person data with id '%d' edited.", id))
 }
 
 type ErrPersonDataNotFound interface {

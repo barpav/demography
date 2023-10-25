@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -51,4 +52,6 @@ func (s *Service) getPersonDataV1(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	log.Info().Msg(fmt.Sprintf("Person data with id '%d' returned.", id))
 }

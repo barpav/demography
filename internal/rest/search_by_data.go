@@ -47,6 +47,8 @@ func (s *Service) searchByDataV1(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	log.Info().Msg(fmt.Sprintf("Search results: %d", result.Total))
 }
 
 func searchFilters(r *http.Request) (filters *models.SearchFilters, err error) {

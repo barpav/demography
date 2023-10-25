@@ -60,6 +60,8 @@ func (s *Service) addNewPersonV1(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	log.Info().Msg(fmt.Sprintf("Person data with id '%d' created.", fullData.Id))
 }
 
 func (s *Service) enrichedPersonDataV1(ctx context.Context, data *models.NewPersonDataV1) (result *models.EnrichedPersonDataV1, err error) {
@@ -78,6 +80,7 @@ func (s *Service) enrichedPersonDataV1(ctx context.Context, data *models.NewPers
 	go func() {
 		wg.Wait()
 		close(done)
+		log.Debug().Msg("enrichedPersonDataV1: all goroutines are finished")
 	}()
 
 	// receiving age statistics from 3rd party (retries in timeout range)
@@ -87,11 +90,13 @@ func (s *Service) enrichedPersonDataV1(ctx context.Context, data *models.NewPers
 			select {
 			case <-interrupt:
 				wg.Done()
+				log.Debug().Msg("enrichedPersonDataV1: age receiving goroutine interrupted")
 				return
 			default:
 				age, statsErr = s.stats.AgeByName(data.Name)
 				if statsErr == nil {
 					wg.Done()
+					log.Debug().Msg("enrichedPersonDataV1: age receiving goroutine completed")
 					return
 				} else {
 					log.Err(statsErr).Msg("Failed to receive age statistics.")
@@ -107,11 +112,13 @@ func (s *Service) enrichedPersonDataV1(ctx context.Context, data *models.NewPers
 			select {
 			case <-interrupt:
 				wg.Done()
+				log.Debug().Msg("enrichedPersonDataV1: gender receiving goroutine interrupted")
 				return
 			default:
 				gender, statsErr = s.stats.GenderByName(data.Name)
 				if statsErr == nil {
 					wg.Done()
+					log.Debug().Msg("enrichedPersonDataV1: gender receiving goroutine completed")
 					return
 				} else {
 					log.Err(statsErr).Msg("Failed to receive gender statistics.")
@@ -127,11 +134,13 @@ func (s *Service) enrichedPersonDataV1(ctx context.Context, data *models.NewPers
 			select {
 			case <-interrupt:
 				wg.Done()
+				log.Debug().Msg("enrichedPersonDataV1: country receiving goroutine interrupted")
 				return
 			default:
 				country, statsErr = s.stats.CountryByName(data.Name)
 				if statsErr == nil {
 					wg.Done()
+					log.Debug().Msg("enrichedPersonDataV1: country receiving goroutine completed")
 					return
 				} else {
 					log.Err(statsErr).Msg("Failed to receive country statistics.")
