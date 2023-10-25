@@ -3,6 +3,9 @@ up:
 down:
 	sudo docker-compose down
 
+logs:
+	sudo docker logs demography-people-v1
+
 up-debug:
 	sudo docker-compose -f debug.compose.yaml up -d
 down-debug:
