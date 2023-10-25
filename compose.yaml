@@ -14,6 +14,7 @@ services:
       - DMG_STORAGE_PASSWORD=${PG_PASSWORD}
       - DMG_STATS_TIMEOUT_MS=${DMG_STATS_TIMEOUT_MS}
       - DMG_HTTP_PORT=${DMG_HTTP_PORT}
+      - DMG_LOG_LEVEL=%{DMG_LOG_LEVEL}
     ports:
       - ${DMG_HTTP_PORT}:${DMG_HTTP_PORT}
     depends_on:

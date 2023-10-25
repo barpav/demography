@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"github.com/barpav/demography/internal/data"
@@ -15,7 +17,12 @@ import (
 	"github.com/barpav/demography/internal/statistics"
 )
 
+const envVarLogLevel = "DMG_LOG_LEVEL"
+const defaultLogLevel = zerolog.InfoLevel
+
 func main() {
+	setGlobalLogLevel()
+
 	app := microservice{}
 	err := app.launch()
 
@@ -75,4 +82,21 @@ func (m *microservice) serveAndShutdownGracefully() (err error) {
 	err = errors.Join(err, m.storage.Close(ctx))
 
 	return err
+}
+
+func setGlobalLogLevel() {
+	env := os.Getenv(envVarLogLevel)
+
+	if env != "" {
+		level, err := zerolog.ParseLevel(env)
+
+		if err == nil {
+			zerolog.SetGlobalLevel(level)
+			return
+		}
+
+		log.Err(err).Msg(fmt.Sprintf("Failed to set global log level '%s' from %s.", env, envVarLogLevel))
+	}
+
+	zerolog.SetGlobalLevel(defaultLogLevel)
 }
