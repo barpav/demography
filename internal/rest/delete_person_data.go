@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -29,6 +30,8 @@ func (s *Service) deletePersonData(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	log.Info().Msg(fmt.Sprintf("Person data with id '%d' deleted.", id))
 
 	w.WriteHeader(http.StatusNoContent)
 }
